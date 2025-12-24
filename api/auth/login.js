@@ -1,41 +1,16 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("loginForm");
-
-  if (!form) {
-    console.error("Form login tidak ditemukan");
-    return;
+export default function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  const { username, password } = req.body;
 
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+  if (username === "ortu1" && password === "123456") {
+    return res.status(200).json({
+      token: "DUMMY_TOKEN",
+      user: { username, role: "ortu" },
+    });
+  }
 
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message || "Login gagal");
-        return;
-      }
-
-      // SIMPAN TOKEN (KRITIS)
-      localStorage.setItem("token", data.token);
-
-      // REDIRECT (KRITIS)
-      window.location.href = "/dashboard.html";
-    } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan saat login");
-    }
-  });
-});
+  res.status(401).json({ message: "Login gagal" });
+}
