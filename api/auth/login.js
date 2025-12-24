@@ -68,3 +68,7 @@ module.exports = async function handler(req, res) {
     });
   }
 };
+localStorage.setItem("token", data.token);
+localStorage.setItem("user", JSON.stringify(data.user));
+
+window.location.href = "dashboard.html";
