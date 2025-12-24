@@ -1,6 +1,6 @@
 module.exports = function handler(req, res) {
   res.status(200).json({
     status: "ok",
-    message: "Backend Vercel aktif"
+    message: "Backend Vercel aktif",
   });
 };
