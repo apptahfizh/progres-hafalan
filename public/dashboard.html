@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard ORTU</title>
+  </head>
+  <body>
+    <h1>Dashboard ORTU</h1>
+    <p id="welcome"></p>
+
+    <button onclick="logout()">Logout</button>
+
+    <!-- AUTH GUARD (WAJIB PALING ATAS SCRIPT) -->
+    <script src="/assets/js/auth.js"></script>
+
+    <script>
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      document.getElementById("welcome").innerText =
+        "Selamat datang, " + user.name;
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/login.html";
+      }
+    </script>
+  </body>
+</html>
