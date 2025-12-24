@@ -1,40 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
   <head>
+    <meta charset="UTF-8" />
     <title>Login ORTU</title>
   </head>
   <body>
     <h2>Login ORTU</h2>
 
-    <input id="username" placeholder="Username" />
-    <input id="password" type="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <br /><br />
 
-    <script>
-      async function login() {
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
+      <input type="password" id="password" placeholder="Password" required />
+      <br /><br />
 
-        const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-        });
+      <button type="submit">Login</button>
+    </form>
 
-        const data = await res.json();
-
-        if (!res.ok) {
-          alert(data.message || "Login gagal");
-          return;
-        }
-
-        // SIMPAN TOKEN & USER
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        // REDIRECT
-        window.location.href = "/dashboard.html";
-      }
-    </script>
+    <!-- WAJIB -->
+    <script src="login.js"></script>
   </body>
 </html>
