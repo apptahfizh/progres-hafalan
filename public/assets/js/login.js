@@ -20,5 +20,7 @@ async function login() {
   localStorage.setItem("token", data.token);
   localStorage.setItem("user", JSON.stringify(data.user));
 
+  console.log("LOGIN SUCCESS, REDIRECTING");
+
   window.location.href = "/dashboard.html";
 }
