@@ -1,5 +1,8 @@
 {
-    "private":  true,
-    "name":  "progres-hafalan",
-    "version":  "1.0.0"
+    "private": true,
+    "name": "progres-hafalan",
+    "version": "1.0.0",
+    "dependencies": {
+        "jsonwebtoken": "^9.0.3"
+    }
 }
