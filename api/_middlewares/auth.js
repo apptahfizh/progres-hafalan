@@ -1,34 +1,41 @@
-// ================================
-// AUTH MIDDLEWARE (JWT + ROLE)
-// ================================
-const { verifyToken } = require("../_utils/jwt");
+const jwt = require("jsonwebtoken");
 
-function auth(allowedRoles = []) {
-  return function (req, res) {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    let payload;
+module.exports = (roles = []) => {
+  return (req, res) => {
     try {
-      payload = verifyToken(token);
+      const authHeader = req.headers.authorization;
+
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        res.status(401).json({ message: "Unauthorized" });
+        return false;
+      }
+
+      const token = authHeader.split(" ")[1];
+
+      if (!token) {
+        res.status(401).json({ message: "Unauthorized" });
+        return false;
+      }
+
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (err) {
+        res.status(401).json({ message: "Unauthorized" });
+        return false;
+      }
+
+      if (roles.length && !roles.includes(decoded.role)) {
+        res.status(403).json({ message: "Akses ditolak" });
+        return false;
+      }
+
+      req.user = decoded;
+      return true;
     } catch (err) {
-      return res.status(401).json({ message: "Invalid token" });
+      console.error("AUTH MIDDLEWARE ERROR:", err);
+      res.status(401).json({ message: "Unauthorized" });
+      return false;
     }
-
-    if (allowedRoles.length > 0 && !allowedRoles.includes(payload.role)) {
-      return res.status(403).json({ message: "Forbidden" });
-    }
-
-    // inject user info
-    req.user = payload;
-
-    return true;
   };
-}
-
-module.exports = auth;
+};
