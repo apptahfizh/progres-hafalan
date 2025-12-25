@@ -1,20 +1,11 @@
-const auth = require("../_middlewares/auth");
+import auth from "../_middlewares/auth.js";
 
-module.exports = async (req, res) => {
-  // Jalankan middleware auth (khusus ORTU)
+export default async function handler(req, res) {
   const allowed = auth(["ortu"])(req, res);
   if (allowed !== true) return;
 
-  // Jika lolos auth
   return res.json({
-    message: "Data hafalan ORTU",
+    data: [{ surah: "Al-Baqarah", ayat: "1-5", status: "Lancar" }],
     user: req.user,
-    data: [
-      {
-        surah: "Al-Baqarah",
-        ayat: "1-5",
-        status: "Lancar",
-      },
-    ],
   });
-};
+}

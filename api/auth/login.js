@@ -1,16 +1,29 @@
-export default function handler(req, res) {
+import jwt from "jsonwebtoken";
+
+const SECRET = process.env.JWT_SECRET || "dev-secret";
+
+export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
+    return res.status(405).json({ message: "Method Not Allowed" });
   }
 
   const { username, password } = req.body;
 
-  if (username === "ortu1" && password === "123456") {
-    return res.status(200).json({
-      token: "DUMMY_TOKEN",
-      user: { username, role: "ortu" },
-    });
+  // USER DUMMY (SIMULASI DB)
+  if (username !== "ortu1" || password !== "123456") {
+    return res.status(401).json({ message: "Username atau password salah" });
   }
 
-  res.status(401).json({ message: "Login gagal" });
+  const user = {
+    id: 1,
+    username: "ortu1",
+    role: "ortu",
+  };
+
+  const token = jwt.sign(user, SECRET, { expiresIn: "1h" });
+
+  return res.status(200).json({
+    token,
+    user,
+  });
 }

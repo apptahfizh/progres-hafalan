@@ -1,41 +1,31 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
-module.exports = (roles = []) => {
+const SECRET = process.env.JWT_SECRET || "dev-secret";
+
+export default function auth(allowedRoles = []) {
   return (req, res) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ message: "Unauthorized" });
+      return false;
+    }
+
+    const token = authHeader.split(" ")[1];
+
     try {
-      const authHeader = req.headers.authorization;
+      const decoded = jwt.verify(token, SECRET);
 
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        res.status(401).json({ message: "Unauthorized" });
-        return false;
-      }
-
-      const token = authHeader.split(" ")[1];
-
-      if (!token) {
-        res.status(401).json({ message: "Unauthorized" });
-        return false;
-      }
-
-      let decoded;
-      try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-      } catch (err) {
-        res.status(401).json({ message: "Unauthorized" });
-        return false;
-      }
-
-      if (roles.length && !roles.includes(decoded.role)) {
-        res.status(403).json({ message: "Akses ditolak" });
+      if (allowedRoles.length && !allowedRoles.includes(decoded.role)) {
+        res.status(403).json({ message: "Forbidden" });
         return false;
       }
 
       req.user = decoded;
       return true;
     } catch (err) {
-      console.error("AUTH MIDDLEWARE ERROR:", err);
       res.status(401).json({ message: "Unauthorized" });
       return false;
     }
   };
-};
+}
