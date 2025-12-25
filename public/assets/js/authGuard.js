@@ -1,9 +1,14 @@
 // ================================
-// AUTH + ROLE GUARD (GLOBAL)
+// AUTH + ROLE GUARD (FINAL FIX)
 // ================================
 (function authGuard() {
   const token = localStorage.getItem("token");
   const userRaw = localStorage.getItem("user");
+
+  // Jika di halaman login, JANGAN guard
+  if (window.location.pathname.endsWith("/login.html")) {
+    return;
+  }
 
   if (!token || !userRaw) {
     window.location.href = "/login.html";
@@ -20,16 +25,16 @@
   }
 
   const role = user.role;
-  const path = window.location.pathname;
+  const page = window.location.pathname.split("/").pop();
 
   const roleAccess = {
-    "/dashboard.html": ["ortu"],
-    "/hafalan.html": ["ortu"],
-    "/admin.html": ["admin"],
-    "/ustadz.html": ["ustadz"],
+    "dashboard.html": ["ortu"],
+    "hafalan.html": ["ortu"],
+    "admin.html": ["admin"],
+    "ustadz.html": ["ustadz"],
   };
 
-  if (roleAccess[path] && !roleAccess[path].includes(role)) {
+  if (roleAccess[page] && !roleAccess[page].includes(role)) {
     alert("Akses ditolak");
     window.location.href = "/login.html";
   }
