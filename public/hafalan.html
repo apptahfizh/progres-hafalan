@@ -30,42 +30,7 @@
     <script src="/assets/js/auth.js"></script>
     <script src="/assets/js/auth-guard.js"></script>
 
-    <script>
-      const token = localStorage.getItem("token");
-
-      fetch("/api/hafalan", {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Akses ditolak");
-          return res.json();
-        })
-        .then((data) => {
-          const tbody = document.getElementById("hafalanBody");
-          tbody.innerHTML = "";
-
-          if (data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='4'>Belum ada data</td></tr>";
-            return;
-          }
-
-          data.forEach((row) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-        <td>${row.tanggal}</td>
-        <td>${row.surah}</td>
-        <td>${row.ayat_hafal}</td>
-        <td>${row.keterangan || "-"}</td>
-      `;
-            tbody.appendChild(tr);
-          });
-        })
-        .catch((err) => {
-          alert("Gagal memuat data hafalan");
-          console.error(err);
-        });
-    </script>
+    <script src="assets/js/authGuard.js"></script>
+    <script src="assets/js/hafalan.js"></script>
   </body>
 </html>
