@@ -1,11 +1,40 @@
-import auth from "../_middlewares/auth.js";
+const auth = require("../_middlewares/auth");
+const db = require("../_utils/db");
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
+  // Auth ORTU
   const allowed = auth(["ortu"])(req, res);
   if (allowed !== true) return;
 
-  return res.json({
-    data: [{ surah: "Al-Baqarah", ayat: "1-5", status: "Lancar" }],
-    user: req.user,
-  });
-}
+  try {
+    const userId = req.user.id;
+
+    const { rows } = await db.query(
+      `
+      SELECT
+        id,
+        tanggal,
+        surah,
+        mulai_setor_ayat,
+        selesai_setor_ayat,
+        ayat_setor,
+        ayat_hafal,
+        keterangan
+      FROM hafalan
+      WHERE user_id = $1
+      ORDER BY tanggal DESC
+      `,
+      [userId]
+    );
+
+    return res.json({
+      message: "Data hafalan ORTU",
+      data: rows,
+    });
+  } catch (err) {
+    console.error("HAFALAN DB ERROR:", err);
+    return res.status(500).json({
+      message: "Gagal mengambil data hafalan",
+    });
+  }
+};

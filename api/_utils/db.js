@@ -1,7 +1,10 @@
-const postgres = require("postgres");
+const { Pool } = require("pg");
 
-const sql = postgres(process.env.DATABASE_URL, {
-  ssl: "require",
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 });
 
-module.exports = sql;
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+};
