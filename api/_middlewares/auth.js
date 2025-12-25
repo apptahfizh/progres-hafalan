@@ -1,31 +1,28 @@
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
-const SECRET = process.env.JWT_SECRET || "dev-secret";
-
-export default function auth(allowedRoles = []) {
+module.exports = (roles = []) => {
   return (req, res) => {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      res.status(401).json({ message: "Unauthorized" });
-      return false;
-    }
-
-    const token = authHeader.split(" ")[1];
-
     try {
-      const decoded = jwt.verify(token, SECRET);
+      const authHeader = req.headers.authorization;
 
-      if (allowedRoles.length && !allowedRoles.includes(decoded.role)) {
-        res.status(403).json({ message: "Forbidden" });
+      if (!authHeader) {
+        res.status(401).json({ message: "No token provided" });
+        return false;
+      }
+
+      const token = authHeader.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      if (roles.length && !roles.includes(decoded.role)) {
+        res.status(403).json({ message: "Access denied" });
         return false;
       }
 
       req.user = decoded;
       return true;
     } catch (err) {
-      res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ message: "Invalid token" });
       return false;
     }
   };
-}
+};
