@@ -1,29 +1,43 @@
 console.log("DASHBOARD.JS LOADED");
 
-document.addEventListener("DOMContentLoaded", loadDashboard);
+import { apiFetch } from "./api.js";
 
 async function loadDashboard() {
-  const container = document.getElementById("hafalanList");
-
   try {
-    const data = await apiFetch("/api/hafalan");
+    console.log("LOAD DASHBOARD DATA");
 
-    if (!data || !data.data) {
-      container.innerHTML = "<p>Tidak ada data</p>";
+    const res = await apiFetch("/api/hafalan");
+
+    // res di sini adalah Response, BUKAN JSON
+    const data = await res.json();
+
+    console.log("DASHBOARD DATA:", data);
+
+    const container = document.getElementById("hafalanList");
+
+    if (!data || !data.data || data.data.length === 0) {
+      container.innerHTML = "<p>Tidak ada data hafalan</p>";
       return;
     }
 
-    container.innerHTML = `
-      <ul>
-        ${data.data
-          .map(
-            (item) => `<li>${item.surah} (${item.ayat}) - ${item.status}</li>`
-          )
-          .join("")}
-      </ul>
-    `;
+    container.innerHTML = data.data
+      .map(
+        (item) => `
+        <div>
+          <strong>${item.surah}</strong><br />
+          Ayat: ${item.ayat}<br />
+          Status: ${item.status}
+        </div>
+        <hr />
+      `
+      )
+      .join("");
   } catch (err) {
-    console.error(err);
-    container.innerHTML = "<p>Gagal memuat data</p>";
+    console.error("DASHBOARD ERROR:", err);
+    // JANGAN redirect di sini
+    // redirect sudah ditangani apiFetch
   }
 }
+
+// JALANKAN
+loadDashboard();
