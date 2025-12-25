@@ -26,6 +26,9 @@ document
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      console.log("TOKEN:", localStorage.getItem("token"));
+      console.log("USER:", localStorage.getItem("user"));
+
       console.log("LOGIN SUCCESS, REDIRECTING");
 
       // REDIRECT
