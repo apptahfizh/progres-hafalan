@@ -3,38 +3,32 @@ console.log("LOGIN.JS LOADED");
 document
   .getElementById("loginForm")
   .addEventListener("submit", async function (e) {
-    e.preventDefault();
+    e.preventDefault(); // ⛔ STOP reload default browser
+
+    console.log("LOGIN SUBMIT TRIGGERED");
 
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (!res.ok) {
-        alert(data.message || "Login gagal");
-        return;
-      }
-
-      // SIMPAN TOKEN & USER
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      console.log("TOKEN:", localStorage.getItem("token"));
-      console.log("USER:", localStorage.getItem("user"));
-
-      console.log("LOGIN SUCCESS, REDIRECTING");
-
-      // REDIRECT
-      window.location.href = "/dashboard.html";
-    } catch (err) {
-      console.error("LOGIN ERROR:", err);
-      alert("Terjadi kesalahan saat login");
+    if (!res.ok) {
+      alert(data.message || "Login gagal");
+      return;
     }
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    console.log("TOKEN SAVED:", localStorage.getItem("token"));
+    console.log("USER SAVED:", localStorage.getItem("user"));
+    console.log("LOGIN SUCCESS, REDIRECTING");
+
+    window.location.href = "/dashboard.html";
   });
