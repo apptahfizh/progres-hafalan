@@ -1,7 +1,6 @@
 console.log("API.JS LOADED");
 
-// helper fetch dengan token otomatis
-export async function apiFetch(url, options = {}) {
+async function apiFetch(url, options = {}) {
   const token = localStorage.getItem("token");
 
   const headers = {
@@ -18,19 +17,13 @@ export async function apiFetch(url, options = {}) {
     headers,
   });
 
-  // JIKA TOKEN INVALID / EXPIRED
   if (res.status === 401) {
     console.warn("API 401 → LOGOUT");
-
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     window.location.href = "/login.html";
-
-    // HENTIKAN eksekusi file pemanggil
     throw new Error("Unauthorized");
   }
 
-  // KEMBALIKAN RESPONSE UTUH
-  return res;
+  return res.json();
 }
