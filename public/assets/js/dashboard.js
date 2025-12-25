@@ -1,8 +1,29 @@
-apiFetch("/api/hafalan").then((data) => {
-  console.log("Data hafalan:", data);
-});
+console.log("DASHBOARD.JS LOADED");
 
-document.getElementById("btnLogout")?.addEventListener("click", () => {
-  localStorage.removeItem("token");
-  window.location.href = "/login.html";
-});
+document.addEventListener("DOMContentLoaded", loadDashboard);
+
+async function loadDashboard() {
+  const container = document.getElementById("hafalanList");
+
+  try {
+    const data = await apiFetch("/api/hafalan");
+
+    if (!data || !data.data) {
+      container.innerHTML = "<p>Tidak ada data</p>";
+      return;
+    }
+
+    container.innerHTML = `
+      <ul>
+        ${data.data
+          .map(
+            (item) => `<li>${item.surah} (${item.ayat}) - ${item.status}</li>`
+          )
+          .join("")}
+      </ul>
+    `;
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p>Gagal memuat data</p>";
+  }
+}

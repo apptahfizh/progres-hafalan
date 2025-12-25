@@ -1,18 +1,26 @@
+console.log("API.JS LOADED");
+
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem("token");
 
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const res = await fetch(url, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...(options.headers || {}),
-    },
+    headers,
   });
 
+  // AUTO LOGOUT JIKA TOKEN INVALID
   if (res.status === 401) {
-    alert("Sesi habis, silakan login ulang");
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     window.location.href = "/login.html";
     return;
   }
