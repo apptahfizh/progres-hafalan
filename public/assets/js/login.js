@@ -1,34 +1,45 @@
 console.log("LOGIN.JS LOADED");
 
-document
-  .getElementById("loginForm")
-  .addEventListener("submit", async function (e) {
-    e.preventDefault(); // ⛔ STOP reload default browser
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("loginForm");
 
-    console.log("LOGIN SUBMIT TRIGGERED");
+  if (!form) {
+    console.error("LOGIN FORM NOT FOUND");
+    return;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // ⛔ Cegah reload browser
 
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    console.log("SUBMIT LOGIN:", username);
 
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (!res.ok) {
-      alert(data.message || "Login gagal");
-      return;
+      const data = await res.json();
+      console.log("LOGIN RESPONSE:", data);
+
+      if (!res.ok) {
+        alert(data.message || "Login gagal");
+        return;
+      }
+
+      // 🔴 WAJIB — INI YANG SEBELUMNYA TIDAK TERJALAN
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      console.log("LOGIN SUCCESS → REDIRECT DASHBOARD");
+      window.location.href = "/dashboard.html";
+    } catch (err) {
+      console.error("LOGIN ERROR:", err);
+      alert("Server error");
     }
-
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-
-    console.log("TOKEN SAVED:", localStorage.getItem("token"));
-    console.log("USER SAVED:", localStorage.getItem("user"));
-    console.log("LOGIN SUCCESS, REDIRECTING");
-
-    window.location.href = "/dashboard.html";
   });
+});
