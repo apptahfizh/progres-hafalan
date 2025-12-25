@@ -1,4 +1,5 @@
 console.log("LOGIN.JS LOADED");
+console.log("USER DARI BACKEND:", data.user);
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
