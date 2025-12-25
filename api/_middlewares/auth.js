@@ -1,41 +1,34 @@
+// ================================
+// AUTH MIDDLEWARE (JWT + ROLE)
+// ================================
 const { verifyToken } = require("../_utils/jwt");
 
-module.exports = function auth(requiredRoles = []) {
-  return (req, res) => {
-    try {
-      const authHeader = req.headers.authorization || "";
-      const token = authHeader.startsWith("Bearer ")
-        ? authHeader.slice(7)
-        : null;
+function auth(allowedRoles = []) {
+  return function (req, res) {
+    const authHeader = req.headers.authorization;
 
-      if (!token) {
-        return res.status(401).json({
-          message: "Token tidak ditemukan",
-        });
-      }
-
-      const payload = verifyToken(token);
-      if (!payload) {
-        return res.status(401).json({
-          message: "Token tidak valid atau expired",
-        });
-      }
-
-      // Cek role jika ditentukan
-      if (requiredRoles.length > 0 && !requiredRoles.includes(payload.role)) {
-        return res.status(403).json({
-          message: "Akses ditolak",
-        });
-      }
-
-      // Inject user ke request
-      req.user = payload;
-
-      return true; // lanjut ke handler
-    } catch (err) {
-      return res.status(500).json({
-        message: "Auth middleware error",
-      });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
+
+    const token = authHeader.split(" ")[1];
+
+    let payload;
+    try {
+      payload = verifyToken(token);
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    if (allowedRoles.length > 0 && !allowedRoles.includes(payload.role)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    // inject user info
+    req.user = payload;
+
+    return true;
   };
-};
+}
+
+module.exports = auth;
