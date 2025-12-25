@@ -1,8 +1,16 @@
 // ================================
-// AUTH + ROLE GUARD (SAFE)
+// AUTH + ROLE GUARD (FINAL SAFE)
 // ================================
 (function authGuard() {
-  console.log("AUTH GUARD RUNNING ON:", window.location.pathname);
+  const path = window.location.pathname;
+
+  // ⛔ JANGAN PERNAH JALANKAN GUARD DI LOGIN PAGE
+  if (path === "/login.html" || path === "/") {
+    console.log("AUTH GUARD SKIPPED ON LOGIN PAGE");
+    return;
+  }
+
+  console.log("AUTH GUARD RUNNING ON:", path);
 
   const token = localStorage.getItem("token");
   const userRaw = localStorage.getItem("user");
@@ -24,7 +32,6 @@
   }
 
   const role = user.role;
-  const path = window.location.pathname;
 
   const roleAccess = {
     "/dashboard.html": ["ortu"],
@@ -36,6 +43,7 @@
   if (roleAccess[path] && !roleAccess[path].includes(role)) {
     alert("Akses ditolak");
     window.location.href = "/login.html";
+    return;
   }
 
   console.log("AUTH GUARD PASS:", role);
